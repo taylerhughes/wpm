@@ -83,7 +83,7 @@ export default function Backlog() {
         setCurrentAccount(currentAcc);
       }
 
-      const loadedIssues = await storageUtils.seedDummyData();
+      const loadedIssues = await storageUtils.getIssues();
       const sorted = loadedIssues.sort((a, b) => a.priority - b.priority);
       setIssues(sorted);
       setLoading(false);
