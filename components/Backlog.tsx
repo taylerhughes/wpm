@@ -257,14 +257,35 @@ export default function Backlog() {
         const content = e.target?.result as string;
         const importedData = JSON.parse(content);
 
-        // Check if it's an array
-        const issuesArray = Array.isArray(importedData) ? importedData : [importedData];
+        // Handle both old format (array) and new format (object with issues and currentFocus)
+        let issuesArray: any[];
+        let importedFocus: string | undefined;
+
+        if (importedData.issues && Array.isArray(importedData.issues)) {
+          // New format: { issues: [...], currentFocus: "..." }
+          issuesArray = importedData.issues;
+          importedFocus = importedData.currentFocus;
+        } else if (Array.isArray(importedData)) {
+          // Old format: just an array of issues
+          issuesArray = importedData;
+        } else {
+          // Single issue object
+          issuesArray = [importedData];
+        }
 
         // Import the issues
         const allIssues = await storageUtils.importIssues(issuesArray);
         setIssues(allIssues.sort((a, b) => a.priority - b.priority));
 
-        alert(`Successfully imported ${issuesArray.length} issue(s)`);
+        // Import currentFocus if present
+        if (importedFocus !== undefined && currentAccount) {
+          setCurrentFocus(importedFocus);
+          await storageUtils.updateAccountFocus(currentAccount.id, importedFocus);
+          setCurrentAccount({ ...currentAccount, currentFocus: importedFocus });
+        }
+
+        const focusMessage = importedFocus ? ' (including current focus)' : '';
+        alert(`Successfully imported ${issuesArray.length} issue(s)${focusMessage}`);
       } catch (error) {
         alert('Failed to import: Invalid JSON file');
         console.error('Import error:', error);
