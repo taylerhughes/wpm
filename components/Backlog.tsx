@@ -22,6 +22,7 @@ import {
 } from '@dnd-kit/sortable';
 import { Issue, IssueCategory, Account } from '@/types/issue';
 import { storageUtils } from '@/lib/storage';
+import { migrateToSupabase, checkMigrationStatus } from '@/lib/migration';
 import SortableIssueCard from './SortableIssueCard';
 import IssueModal from './IssueModal';
 import EmptyCategory from './EmptyCategory';
@@ -44,6 +45,7 @@ export default function Backlog() {
   const [categoryAddForm, setCategoryAddForm] = useState<{ category: IssueCategory; title: string; position: 'top' | 'bottom' } | null>(null);
   const [currentFocus, setCurrentFocus] = useState('');
   const [showCurrentFocus, setShowCurrentFocus] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -58,31 +60,50 @@ export default function Backlog() {
 
   // Load accounts and issues on mount
   useEffect(() => {
-    const loadedAccounts = storageUtils.getAccounts();
-    const currentAcc = storageUtils.getCurrentAccount();
+    const loadData = async () => {
+      setLoading(true);
 
-    if (loadedAccounts.length === 0 || !currentAcc) {
-      storageUtils.initializeAccounts();
-      setAccounts(storageUtils.getAccounts());
-      setCurrentAccount(storageUtils.getCurrentAccount());
-    } else {
-      setAccounts(loadedAccounts);
-      setCurrentAccount(currentAcc);
-    }
+      // Check if migration is needed
+      if (checkMigrationStatus()) {
+        const migrated = await migrateToSupabase();
+        if (migrated) {
+          console.log('Data migrated from localStorage to Supabase');
+        }
+      }
 
-    const loadedIssues = storageUtils.seedDummyData();
-    const sorted = loadedIssues.sort((a, b) => a.priority - b.priority);
-    setIssues(sorted);
+      const loadedAccounts = await storageUtils.getAccounts();
+      const currentAcc = await storageUtils.getCurrentAccount();
+
+      if (loadedAccounts.length === 0 || !currentAcc) {
+        await storageUtils.initializeAccounts();
+        setAccounts(await storageUtils.getAccounts());
+        setCurrentAccount(await storageUtils.getCurrentAccount());
+      } else {
+        setAccounts(loadedAccounts);
+        setCurrentAccount(currentAcc);
+      }
+
+      const loadedIssues = await storageUtils.seedDummyData();
+      const sorted = loadedIssues.sort((a, b) => a.priority - b.priority);
+      setIssues(sorted);
+      setLoading(false);
+    };
+
+    loadData();
   }, []);
 
   // Reload issues when account changes
   useEffect(() => {
-    if (currentAccount) {
-      const loadedIssues = storageUtils.getIssues();
-      const sorted = loadedIssues.sort((a, b) => a.priority - b.priority);
-      setIssues(sorted);
-      setCurrentFocus(currentAccount.currentFocus || '');
-    }
+    const loadIssues = async () => {
+      if (currentAccount) {
+        const loadedIssues = await storageUtils.getIssues();
+        const sorted = loadedIssues.sort((a, b) => a.priority - b.priority);
+        setIssues(sorted);
+        setCurrentFocus(currentAccount.currentFocus || '');
+      }
+    };
+
+    loadIssues();
   }, [currentAccount]);
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -92,7 +113,7 @@ export default function Backlog() {
     setActiveIssue(issue || null);
   };
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragEnd = async (event: DragEndEvent) => {
     setActiveId(null);
     setActiveIssue(null);
     const { active, over } = event;
@@ -157,18 +178,18 @@ export default function Backlog() {
     });
   };
 
-  const handleAddIssue = () => {
+  const handleAddIssue = async () => {
     if (!newIssueTitle.trim()) return;
 
-    const newIssue = storageUtils.addIssue(newIssueTitle, '', 'planned');
+    const newIssue = await storageUtils.addIssue(newIssueTitle, '', 'planned');
     setIssues([...issues, newIssue]);
     setNewIssueTitle('');
   };
 
-  const handleAddIssueToCategory = (category: IssueCategory, title: string, position: 'top' | 'bottom') => {
+  const handleAddIssueToCategory = async (category: IssueCategory, title: string, position: 'top' | 'bottom') => {
     if (!title.trim()) return;
 
-    const newIssue = storageUtils.addIssue(title, '', category);
+    const newIssue = await storageUtils.addIssue(title, '', category);
 
     // Update priorities based on position
     const categoryIssues = issues.filter(i => i.category === category);
@@ -195,7 +216,7 @@ export default function Backlog() {
 
     // Reorder to fix priorities
     const sorted = updatedIssues.sort((a, b) => a.priority - b.priority);
-    storageUtils.reorderIssues(sorted);
+    await storageUtils.reorderIssues(sorted);
     setIssues(sorted);
     setCategoryAddForm(null);
   };
@@ -205,33 +226,33 @@ export default function Backlog() {
     handleAddIssueToCategory(categoryAddForm.category, categoryAddForm.title, categoryAddForm.position);
   };
 
-  const handleUpdateCurrentFocus = (newFocus: string) => {
+  const handleUpdateCurrentFocus = async (newFocus: string) => {
     setCurrentFocus(newFocus);
     if (currentAccount) {
-      storageUtils.updateAccountFocus(currentAccount.id, newFocus);
+      await storageUtils.updateAccountFocus(currentAccount.id, newFocus);
       // Update local state
       setCurrentAccount({ ...currentAccount, currentFocus: newFocus });
     }
   };
 
-  const handleUpdateIssue = (id: string, updates: Partial<Issue>) => {
-    const updated = storageUtils.updateIssue(id, updates);
+  const handleUpdateIssue = async (id: string, updates: Partial<Issue>) => {
+    const updated = await storageUtils.updateIssue(id, updates);
     if (updated) {
       setIssues(issues.map(issue => issue.id === id ? updated : issue));
     }
   };
 
-  const handleDeleteIssue = (id: string) => {
-    storageUtils.deleteIssue(id);
+  const handleDeleteIssue = async (id: string) => {
+    await storageUtils.deleteIssue(id);
     setIssues(issues.filter(issue => issue.id !== id));
   };
 
-  const handleImportIssues = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImportIssues = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       try {
         const content = e.target?.result as string;
         const importedData = JSON.parse(content);
@@ -240,7 +261,7 @@ export default function Backlog() {
         const issuesArray = Array.isArray(importedData) ? importedData : [importedData];
 
         // Import the issues
-        const allIssues = storageUtils.importIssues(issuesArray);
+        const allIssues = await storageUtils.importIssues(issuesArray);
         setIssues(allIssues.sort((a, b) => a.priority - b.priority));
 
         alert(`Successfully imported ${issuesArray.length} issue(s)`);
@@ -256,7 +277,11 @@ export default function Backlog() {
   };
 
   const handleExportIssues = () => {
-    const dataStr = JSON.stringify(issues, null, 2);
+    const exportData = {
+      issues: issues,
+      currentFocus: currentFocus
+    };
+    const dataStr = JSON.stringify(exportData, null, 2);
     const dataBlob = new Blob([dataStr], { type: 'application/json' });
     const url = URL.createObjectURL(dataBlob);
     const link = document.createElement('a');
@@ -266,17 +291,17 @@ export default function Backlog() {
     URL.revokeObjectURL(url);
   };
 
-  const handleSwitchAccount = (accountId: string) => {
+  const handleSwitchAccount = async (accountId: string) => {
     storageUtils.setCurrentAccount(accountId);
-    setCurrentAccount(storageUtils.getCurrentAccount());
+    setCurrentAccount(await storageUtils.getCurrentAccount());
     setShowAccountDropdown(false);
   };
 
-  const handleCreateAccount = () => {
+  const handleCreateAccount = async () => {
     if (!newAccountName.trim()) return;
 
-    const newAccount = storageUtils.createAccount(newAccountName);
-    setAccounts(storageUtils.getAccounts());
+    const newAccount = await storageUtils.createAccount(newAccountName);
+    setAccounts(await storageUtils.getAccounts());
     storageUtils.setCurrentAccount(newAccount.id);
     setCurrentAccount(newAccount);
     setNewAccountName('');
@@ -350,6 +375,17 @@ export default function Backlog() {
 
   // Count done issues
   const doneCount = issues.filter(issue => issue.category === 'done').length;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

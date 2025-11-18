@@ -1,0 +1,674 @@
+[
+  {
+    "title": "Complete business plan",
+    "description": "Revenue targets, phase timelines, hiring plan",
+    "category": "planned",
+    "tags": ["Foundation", "Business Planning"],
+    "dueDate": "Week 1-2"
+  },
+  {
+    "title": "Build financial model",
+    "description": "Current run rate → £500k projection with phase breakdown",
+    "category": "planned",
+    "tags": ["Foundation", "Business Planning"],
+    "dueDate": "Week 1-2"
+  },
+  {
+    "title": "Set up separate business bank account",
+    "description": "If not already done",
+    "category": "planned",
+    "tags": ["Foundation", "Business Planning"],
+    "dueDate": "Week 1-2"
+  },
+  {
+    "title": "Establish 3-month cash reserve target",
+    "description": "Calculate amount needed and plan to build it",
+    "category": "planned",
+    "tags": ["Foundation", "Business Planning"],
+    "dueDate": "Week 1-2"
+  },
+  {
+    "title": "Create simple bookkeeping system",
+    "description": "Set up Xero, QuickBooks, or similar",
+    "category": "planned",
+    "tags": ["Foundation", "Business Planning"],
+    "dueDate": "Week 1-2"
+  },
+  {
+    "title": "Audit last 3-5 projects",
+    "description": "Document actual process used in each project",
+    "category": "planned",
+    "tags": ["Foundation", "Positioning"],
+    "dueDate": "Week 3-4"
+  },
+  {
+    "title": "Define 'The Willard Approach'",
+    "description": "Name your methodology and create initial framework",
+    "category": "planned",
+    "tags": ["Foundation", "Positioning"],
+    "dueDate": "Week 3-4"
+  },
+  {
+    "title": "Map out process phases",
+    "description": "Define Discovery → Strategy → Design → etc.",
+    "category": "planned",
+    "tags": ["Foundation", "Positioning"],
+    "dueDate": "Week 3-4"
+  },
+  {
+    "title": "Identify 2-3 proprietary frameworks",
+    "description": "E.g., Validation Sprint, Transformation Roadmap",
+    "category": "planned",
+    "tags": ["Foundation", "Positioning"],
+    "dueDate": "Week 3-4"
+  },
+  {
+    "title": "Write positioning statement",
+    "description": "Willard helps [who] achieve [what] through [how]",
+    "category": "planned",
+    "tags": ["Foundation", "Positioning"],
+    "dueDate": "Week 3-4"
+  },
+  {
+    "title": "Define two target markets",
+    "description": "(1) Startups at X stage, (2) Digital transformation consultancies with Y characteristics",
+    "category": "planned",
+    "tags": ["Foundation", "Positioning"],
+    "dueDate": "Week 3-4"
+  },
+  {
+    "title": "Create 'How We Work' one-pager",
+    "description": "Explain your methodology visually and concisely",
+    "category": "planned",
+    "tags": ["IP Development"],
+    "dueDate": "Month 2 Week 1-2"
+  },
+  {
+    "title": "Build 1-2 core templates",
+    "description": "E.g., Strategic Design Brief, Product Strategy Canvas",
+    "category": "planned",
+    "tags": ["IP Development"],
+    "dueDate": "Month 2 Week 1-2"
+  },
+  {
+    "title": "Design one workshop template",
+    "description": "Create reusable Miro/FigJam workshop board",
+    "category": "planned",
+    "tags": ["IP Development"],
+    "dueDate": "Month 2 Week 1-2"
+  },
+  {
+    "title": "Draft first packaged offering",
+    "description": "E.g., '2-Week Product Validation Sprint - £12k' with fixed scope",
+    "category": "planned",
+    "tags": ["IP Development"],
+    "dueDate": "Month 2 Week 1-2"
+  },
+  {
+    "title": "Write Willard Design Principles",
+    "description": "Define 5-7 principles that guide all your work",
+    "category": "planned",
+    "tags": ["IP Development"],
+    "dueDate": "Month 2 Week 1-2"
+  },
+  {
+    "title": "Conversation with consultancy client about Willard",
+    "description": "Transition to invoicing through Willard, explain benefits",
+    "category": "planned",
+    "tags": ["Client Transition"],
+    "dueDate": "Month 2 Week 3-4"
+  },
+  {
+    "title": "Conversation with startup client about Willard",
+    "description": "Transition to invoicing through Willard, explain benefits",
+    "category": "planned",
+    "tags": ["Client Transition"],
+    "dueDate": "Month 2 Week 3-4"
+  },
+  {
+    "title": "Update contracts/MSAs to reflect Willard Ltd",
+    "description": "Ensure all legal documents reflect company structure",
+    "category": "planned",
+    "tags": ["Client Transition"],
+    "dueDate": "Month 2 Week 3-4"
+  },
+  {
+    "title": "Get permission for case studies/testimonials",
+    "description": "From both existing clients, mentioning Willard by name",
+    "category": "planned",
+    "tags": ["Client Transition"],
+    "dueDate": "Month 2 Week 3-4"
+  },
+  {
+    "title": "Define Willard brand attributes",
+    "description": "3-5 words that describe the brand essence",
+    "category": "planned",
+    "tags": ["Branding"],
+    "dueDate": "Month 3 Week 1-2"
+  },
+  {
+    "title": "Create visual identity",
+    "description": "Logo, colors, typography system",
+    "category": "planned",
+    "tags": ["Branding"],
+    "dueDate": "Month 3 Week 1-2"
+  },
+  {
+    "title": "Design business card and email signature",
+    "description": "Branded materials with founder positioning",
+    "category": "planned",
+    "tags": ["Branding"],
+    "dueDate": "Month 3 Week 1-2"
+  },
+  {
+    "title": "Create proposal template",
+    "description": "Branded, features your methodology prominently",
+    "category": "planned",
+    "tags": ["Branding"],
+    "dueDate": "Month 3 Week 1-2"
+  },
+  {
+    "title": "Build case study template format",
+    "description": "Standard format for showcasing projects and methodology",
+    "category": "planned",
+    "tags": ["Branding"],
+    "dueDate": "Month 3 Week 1-2"
+  },
+  {
+    "title": "Increase personal rate to £600-700/day",
+    "description": "Prepare rationale based on Willard value and methodology",
+    "category": "planned",
+    "tags": ["Pricing"],
+    "dueDate": "Month 3 Week 3-4"
+  },
+  {
+    "title": "Communicate rate increase to existing clients",
+    "description": "With appropriate notice period and reasoning",
+    "category": "planned",
+    "tags": ["Pricing"],
+    "dueDate": "Month 3 Week 3-4"
+  },
+  {
+    "title": "Price packaged offerings",
+    "description": "Define 3-5 core packages with clear scope and pricing",
+    "category": "planned",
+    "tags": ["Pricing"],
+    "dueDate": "Month 3 Week 3-4"
+  },
+  {
+    "title": "Update LinkedIn profile",
+    "description": "[Your Name] - Founder, Willard",
+    "category": "planned",
+    "tags": ["Pricing"],
+    "dueDate": "Month 3 Week 3-4"
+  },
+  {
+    "title": "Write LinkedIn bio",
+    "description": "Explain Willard and your approach, position as founder",
+    "category": "planned",
+    "tags": ["Pricing"],
+    "dueDate": "Month 3 Week 3-4"
+  },
+  {
+    "title": "Map out website structure",
+    "description": "Home, About, Services, Methodology, Case Studies, Contact",
+    "category": "planned",
+    "tags": ["Website"],
+    "dueDate": "Month 4 Week 1-2"
+  },
+  {
+    "title": "Write website copy",
+    "description": "Focus on outcomes, methodology, you as founder",
+    "category": "planned",
+    "tags": ["Website"],
+    "dueDate": "Month 4 Week 1-2"
+  },
+  {
+    "title": "Design website in Figma",
+    "description": "Ensure prominent positioning of you alongside Willard brand",
+    "category": "planned",
+    "tags": ["Website"],
+    "dueDate": "Month 4 Week 1-2"
+  },
+  {
+    "title": "Build website",
+    "description": "Use Webflow, Framer, or similar platform",
+    "category": "planned",
+    "tags": ["Website"],
+    "dueDate": "Month 4 Week 3-4"
+  },
+  {
+    "title": "Add 2-3 case studies to website",
+    "description": "From existing work, showcasing methodology",
+    "category": "planned",
+    "tags": ["Website"],
+    "dueDate": "Month 4 Week 3-4"
+  },
+  {
+    "title": "Set up contact form and CRM integration",
+    "description": "Ensure leads are captured and tracked",
+    "category": "planned",
+    "tags": ["Website"],
+    "dueDate": "Month 4 Week 3-4"
+  },
+  {
+    "title": "Launch website",
+    "description": "Go live and test all functionality",
+    "category": "planned",
+    "tags": ["Website"],
+    "dueDate": "Month 4 Week 3-4"
+  },
+  {
+    "title": "Share website launch on LinkedIn",
+    "description": "Create launch post explaining Willard and your vision",
+    "category": "planned",
+    "tags": ["Website"],
+    "dueDate": "Month 4 Week 3-4"
+  },
+  {
+    "title": "Define Figma plugin functionality",
+    "description": "Scope out features and value proposition",
+    "category": "planned",
+    "tags": ["Plugin"],
+    "dueDate": "Month 5 Week 1-4"
+  },
+  {
+    "title": "Design plugin UI/UX",
+    "description": "Create user interface for Figma co-pilot plugin",
+    "category": "planned",
+    "tags": ["Plugin"],
+    "dueDate": "Month 5 Week 1-4"
+  },
+  {
+    "title": "Develop Figma plugin",
+    "description": "Build plugin (or hire developer if needed)",
+    "category": "planned",
+    "tags": ["Plugin"],
+    "dueDate": "Month 5 Week 1-4"
+  },
+  {
+    "title": "Test plugin with own projects",
+    "description": "Use in real client work to refine",
+    "category": "planned",
+    "tags": ["Plugin"],
+    "dueDate": "Month 5 Week 1-4"
+  },
+  {
+    "title": "Create plugin landing page",
+    "description": "Add to website with clear value prop",
+    "category": "planned",
+    "tags": ["Plugin"],
+    "dueDate": "Month 5 Week 1-4"
+  },
+  {
+    "title": "Create 3 detailed case studies",
+    "description": "Showcase Willard methodology and outcomes",
+    "category": "planned",
+    "tags": ["Content"],
+    "dueDate": "Month 6 Week 1-2"
+  },
+  {
+    "title": "Get testimonials from current clients",
+    "description": "Ensure they mention Willard by name",
+    "category": "planned",
+    "tags": ["Content"],
+    "dueDate": "Month 6 Week 1-2"
+  },
+  {
+    "title": "Record video testimonials",
+    "description": "If possible, capture video from satisfied clients",
+    "category": "planned",
+    "tags": ["Content"],
+    "dueDate": "Month 6 Week 1-2"
+  },
+  {
+    "title": "Publish case studies on website",
+    "description": "Add to portfolio section with rich detail",
+    "category": "planned",
+    "tags": ["Content"],
+    "dueDate": "Month 6 Week 1-2"
+  },
+  {
+    "title": "Build list of 30 target startups",
+    "description": "Identify your ideal startup clients",
+    "category": "planned",
+    "tags": ["Pipeline"],
+    "dueDate": "Month 6 Week 3-4"
+  },
+  {
+    "title": "Build list of 20 digital transformation consultancies",
+    "description": "Identify target transformation partners",
+    "category": "planned",
+    "tags": ["Pipeline"],
+    "dueDate": "Month 6 Week 3-4"
+  },
+  {
+    "title": "Create outreach templates",
+    "description": "Personalized, methodology-focused messaging",
+    "category": "planned",
+    "tags": ["Pipeline"],
+    "dueDate": "Month 6 Week 3-4"
+  },
+  {
+    "title": "Set goal: 3 discovery calls per week",
+    "description": "Establish and track business development KPI",
+    "category": "planned",
+    "tags": ["Pipeline"],
+    "dueDate": "Month 6 Week 3-4"
+  },
+  {
+    "title": "Begin outreach campaign",
+    "description": "Start contacting target clients systematically",
+    "category": "planned",
+    "tags": ["Pipeline"],
+    "dueDate": "Month 6 Week 3-4"
+  },
+  {
+    "title": "Launch Figma plugin",
+    "description": "If complete - use for lead generation",
+    "category": "planned",
+    "tags": ["Scale Solo"],
+    "dueDate": "Month 7"
+  },
+  {
+    "title": "Publish 2-3 LinkedIn posts about methodology",
+    "description": "Share insights about your frameworks and approach",
+    "category": "planned",
+    "tags": ["Scale Solo"],
+    "dueDate": "Month 7"
+  },
+  {
+    "title": "Continue outbound outreach",
+    "description": "Target: 5 qualified conversations/week",
+    "category": "planned",
+    "tags": ["Scale Solo"],
+    "dueDate": "Month 7"
+  },
+  {
+    "title": "Close 1 new client at new rates",
+    "description": "£600-700/day rate, demonstrating pricing power",
+    "category": "planned",
+    "tags": ["Scale Solo"],
+    "dueDate": "Month 7"
+  },
+  {
+    "title": "Aim for 8-9 billable days/week",
+    "description": "Across 3 clients - near full capacity",
+    "category": "planned",
+    "tags": ["Scale Solo"],
+    "dueDate": "Month 7"
+  },
+  {
+    "title": "Create project management system",
+    "description": "Templates, workflows, standardized processes",
+    "category": "planned",
+    "tags": ["Systematization"],
+    "dueDate": "Month 8 Week 1-2"
+  },
+  {
+    "title": "Document methodology in detail",
+    "description": "This becomes training material for future hires",
+    "category": "planned",
+    "tags": ["Systematization"],
+    "dueDate": "Month 8 Week 1-2"
+  },
+  {
+    "title": "Build library of templates and tools",
+    "description": "All worksheets, templates, frameworks in one place",
+    "category": "planned",
+    "tags": ["Systematization"],
+    "dueDate": "Month 8 Week 1-2"
+  },
+  {
+    "title": "Create 'Willard Playbook'",
+    "description": "Complete guide: how you run projects start to finish",
+    "category": "planned",
+    "tags": ["Systematization"],
+    "dueDate": "Month 8 Week 1-2"
+  },
+  {
+    "title": "Write job description for first hire",
+    "description": "UX/UI Designer - define role and requirements",
+    "category": "planned",
+    "tags": ["Prepare Hiring"],
+    "dueDate": "Month 8 Week 3-4"
+  },
+  {
+    "title": "Define 'better than you' criteria",
+    "description": "What makes someone excellent in each specialist area",
+    "category": "planned",
+    "tags": ["Prepare Hiring"],
+    "dueDate": "Month 8 Week 3-4"
+  },
+  {
+    "title": "Calculate hiring budget",
+    "description": "Salary + costs vs. billable potential, ensure positive ROI",
+    "category": "planned",
+    "tags": ["Prepare Hiring"],
+    "dueDate": "Month 8 Week 3-4"
+  },
+  {
+    "title": "Create interview process",
+    "description": "Define stages, evaluation criteria, test projects",
+    "category": "planned",
+    "tags": ["Prepare Hiring"],
+    "dueDate": "Month 8 Week 3-4"
+  },
+  {
+    "title": "Review financials",
+    "description": "Are you at £200k run rate?",
+    "category": "planned",
+    "tags": ["Financial Health"],
+    "dueDate": "Month 9"
+  },
+  {
+    "title": "Assess pipeline coverage",
+    "description": "Do you have 3-4x coverage for next quarter?",
+    "category": "planned",
+    "tags": ["Financial Health"],
+    "dueDate": "Month 9"
+  },
+  {
+    "title": "Review IP effectiveness",
+    "description": "Is it working? Are clients buying methodology?",
+    "category": "planned",
+    "tags": ["Financial Health"],
+    "dueDate": "Month 9"
+  },
+  {
+    "title": "Refine packaged offerings",
+    "description": "Based on what's selling vs. what's not",
+    "category": "planned",
+    "tags": ["Financial Health"],
+    "dueDate": "Month 9"
+  },
+  {
+    "title": "Decision: Ready to hire?",
+    "description": "Or need another 1-2 months solo to build runway",
+    "category": "planned",
+    "tags": ["Financial Health"],
+    "dueDate": "Month 9"
+  },
+  {
+    "title": "Post job for Designer #1",
+    "description": "AngelList, LinkedIn, design communities",
+    "category": "planned",
+    "tags": ["First Hire"],
+    "dueDate": "Month 10-11"
+  },
+  {
+    "title": "Screen candidates",
+    "description": "Portfolio review + culture fit assessment",
+    "category": "planned",
+    "tags": ["First Hire"],
+    "dueDate": "Month 10-11"
+  },
+  {
+    "title": "Conduct interviews",
+    "description": "Test with small paid project to assess skills",
+    "category": "planned",
+    "tags": ["First Hire"],
+    "dueDate": "Month 10-11"
+  },
+  {
+    "title": "Make offer to Designer #1",
+    "description": "Present compensation and role clearly",
+    "category": "planned",
+    "tags": ["First Hire"],
+    "dueDate": "Month 10-11"
+  },
+  {
+    "title": "Onboard Designer #1",
+    "description": "Train on Willard methodology, templates, processes",
+    "category": "planned",
+    "tags": ["First Hire"],
+    "dueDate": "Month 10-11"
+  },
+  {
+    "title": "Start billing Designer #1",
+    "description": "At £400-500/day to clients",
+    "category": "planned",
+    "tags": ["Team Delivery"],
+    "dueDate": "Month 12-14"
+  },
+  {
+    "title": "Reduce execution time, increase strategy",
+    "description": "Shift your role toward sales and strategic oversight",
+    "category": "planned",
+    "tags": ["Team Delivery"],
+    "dueDate": "Month 12-14"
+  },
+  {
+    "title": "Target Designer utilization: 60-80%",
+    "description": "3-4 days/week billable for Designer #1",
+    "category": "planned",
+    "tags": ["Team Delivery"],
+    "dueDate": "Month 12-14"
+  },
+  {
+    "title": "Maintain 6-7 billable days/week personally",
+    "description": "While managing team and business development",
+    "category": "planned",
+    "tags": ["Team Delivery"],
+    "dueDate": "Month 12-14"
+  },
+  {
+    "title": "Add 1 new client for Designer capacity",
+    "description": "Fill Designer's available time with billable work",
+    "category": "planned",
+    "tags": ["Team Delivery"],
+    "dueDate": "Month 12-14"
+  },
+  {
+    "title": "Review team performance and financials",
+    "description": "Assess Designer #1 contribution and client satisfaction",
+    "category": "planned",
+    "tags": ["Stabilize"],
+    "dueDate": "Month 15-18"
+  },
+  {
+    "title": "Check run rate: £280-320k?",
+    "description": "Confirm you're on track for next hiring phase",
+    "category": "planned",
+    "tags": ["Stabilize"],
+    "dueDate": "Month 15-18"
+  },
+  {
+    "title": "Refine your role",
+    "description": "Are you truly strategic or still in weeds?",
+    "category": "planned",
+    "tags": ["Stabilize"],
+    "dueDate": "Month 15-18"
+  },
+  {
+    "title": "Identify second hire priority",
+    "description": "Researcher or Visual Designer based on demand?",
+    "category": "planned",
+    "tags": ["Stabilize"],
+    "dueDate": "Month 15-18"
+  },
+  {
+    "title": "Build pipeline for hire #2",
+    "description": "Secure additional clients to support 2nd hire",
+    "category": "planned",
+    "tags": ["Stabilize"],
+    "dueDate": "Month 15-18"
+  },
+  {
+    "title": "Repeat hiring process for hire #2",
+    "description": "Post, screen, interview, hire, onboard",
+    "category": "planned",
+    "tags": ["Stabilize"],
+    "dueDate": "Month 15-18"
+  },
+  {
+    "title": "Hire UX Researcher",
+    "description": "£450/day billable, 70% utilization target",
+    "category": "planned",
+    "tags": ["Complete Team"],
+    "dueDate": "Month 19-24"
+  },
+  {
+    "title": "Hire Senior Visual Designer",
+    "description": "£500/day billable, 80% utilization target",
+    "category": "planned",
+    "tags": ["Complete Team"],
+    "dueDate": "Month 19-24"
+  },
+  {
+    "title": "Promote Designer #1 or hire additional UX Designer",
+    "description": "Based on performance and business needs",
+    "category": "planned",
+    "tags": ["Complete Team"],
+    "dueDate": "Month 19-24"
+  },
+  {
+    "title": "Shift to 4-5 billable days/week",
+    "description": "Focus rest of time on sales/strategy/team management",
+    "category": "planned",
+    "tags": ["Complete Team"],
+    "dueDate": "Month 19-24"
+  },
+  {
+    "title": "Add 2-3 more clients",
+    "description": "To fill team capacity and hit revenue targets",
+    "category": "planned",
+    "tags": ["Scale to £500k"],
+    "dueDate": "Month 25-30"
+  },
+  {
+    "title": "Target 75-80% team utilization",
+    "description": "Optimize billable time across full team",
+    "category": "planned",
+    "tags": ["Scale to £500k"],
+    "dueDate": "Month 25-30"
+  },
+  {
+    "title": "Refine packaged offerings",
+    "description": "Retire what doesn't sell, double down on winners",
+    "category": "planned",
+    "tags": ["Scale to £500k"],
+    "dueDate": "Month 25-30"
+  },
+  {
+    "title": "Build marketing engine",
+    "description": "Content, referrals, partnerships for consistent leads",
+    "category": "planned",
+    "tags": ["Scale to £500k"],
+    "dueDate": "Month 25-30"
+  },
+  {
+    "title": "Hit £500k annual run rate",
+    "description": "Achieve primary revenue goal",
+    "category": "planned",
+    "tags": ["Scale to £500k"],
+    "dueDate": "Month 25-30"
+  },
+  {
+    "title": "Review: What's next?",
+    "description": "Scale to £1M, productize, specialize further?",
+    "category": "planned",
+    "tags": ["Scale to £500k"],
+    "dueDate": "Month 25-30"
+  }
+]

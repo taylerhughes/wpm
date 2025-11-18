@@ -1,118 +1,67 @@
 import { Issue, IssueCategory, Account } from '@/types/issue';
+import { supabase } from './supabase';
 
-const STORAGE_KEY = 'wpm-issues';
-const COUNTER_KEY = 'wpm-issue-counter';
-const VERSION_KEY = 'wpm-data-version';
-const ACCOUNTS_KEY = 'wpm-accounts';
 const CURRENT_ACCOUNT_KEY = 'wpm-current-account';
-const CURRENT_VERSION = '3'; // Increment this to force data refresh
 
-// Generate issue number like "WPM-123"
-const generateIssueNumber = (accountId: string): string => {
-  if (typeof window === 'undefined') return 'WPM-1';
-
-  const accounts = getAccounts();
-  const account = accounts.find(a => a.id === accountId);
-  if (!account) return 'WPM-1';
-
-  const nextNumber = account.issueCounter + 1;
-
-  // Update account counter
-  const updatedAccounts = accounts.map(a =>
-    a.id === accountId ? { ...a, issueCounter: nextNumber } : a
-  );
-  saveAccounts(updatedAccounts);
-
-  return `WPM-${nextNumber}`;
-};
-
-// Get all accounts
-const getAccounts = (): Account[] => {
-  if (typeof window === 'undefined') return [];
-
-  const stored = localStorage.getItem(ACCOUNTS_KEY);
-  if (!stored) return [];
-
-  try {
-    return JSON.parse(stored);
-  } catch {
-    return [];
-  }
-};
-
-// Save accounts
-const saveAccounts = (accounts: Account[]): void => {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
-};
-
-// Get current account ID
+// Get current account ID from localStorage (still used for client-side state)
 const getCurrentAccountId = (): string | null => {
   if (typeof window === 'undefined') return null;
   return localStorage.getItem(CURRENT_ACCOUNT_KEY);
 };
 
-// Set current account ID
+// Set current account ID in localStorage
 const setCurrentAccountId = (accountId: string): void => {
   if (typeof window === 'undefined') return;
   localStorage.setItem(CURRENT_ACCOUNT_KEY, accountId);
 };
 
-// Check if data needs to be migrated to accounts
-const checkVersion = (): void => {
-  if (typeof window === 'undefined') return;
-
-  const storedVersion = localStorage.getItem(VERSION_KEY);
-
-  // Migrate from version 2 to version 3 (account-based storage)
-  if (storedVersion === '2' && CURRENT_VERSION === '3') {
-    const oldIssues = localStorage.getItem(STORAGE_KEY);
-    const oldCounter = localStorage.getItem(COUNTER_KEY);
-
-    if (oldIssues) {
-      // Create Willard account with existing issues
-      const willardAccount: Account = {
-        id: 'willard',
-        name: 'Willard',
-        issueCounter: oldCounter ? parseInt(oldCounter, 10) : 8,
-        currentFocus: '',
-        createdAt: new Date().toISOString(),
-      };
-
-      // Save account
-      saveAccounts([willardAccount]);
-      setCurrentAccountId('willard');
-
-      // Move issues to account-scoped storage
-      localStorage.setItem(`${STORAGE_KEY}-willard`, oldIssues);
-
-      // Clean up old keys
-      localStorage.removeItem(STORAGE_KEY);
-      localStorage.removeItem(COUNTER_KEY);
-    }
-
-    localStorage.setItem(VERSION_KEY, CURRENT_VERSION);
-  } else if (storedVersion !== CURRENT_VERSION) {
-    // For other version changes, just clear and update
-    localStorage.removeItem(STORAGE_KEY);
-    localStorage.removeItem(COUNTER_KEY);
-    localStorage.setItem(VERSION_KEY, CURRENT_VERSION);
-  }
-};
-
 export const storageUtils = {
   // Get all accounts
-  getAccounts: (): Account[] => {
-    return getAccounts();
+  getAccounts: async (): Promise<Account[]> => {
+    const { data, error } = await supabase
+      .from('accounts')
+      .select('*')
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching accounts:', error);
+      return [];
+    }
+
+    return (data || []).map(row => ({
+      id: row.id,
+      name: row.name,
+      issueCounter: row.issue_counter,
+      currentFocus: row.current_focus,
+      createdAt: row.created_at,
+    }));
   },
 
   // Get current account
-  getCurrentAccount: (): Account | null => {
+  getCurrentAccount: async (): Promise<Account | null> => {
     const accountId = getCurrentAccountId();
     if (!accountId) return null;
 
-    const accounts = getAccounts();
-    return accounts.find(a => a.id === accountId) || null;
+    const { data, error } = await supabase
+      .from('accounts')
+      .select('*')
+      .eq('id', accountId)
+      .single();
+
+    if (error) {
+      console.error('Error fetching current account:', error);
+      return null;
+    }
+
+    if (!data) return null;
+
+    return {
+      id: data.id,
+      name: data.name,
+      issueCounter: data.issue_counter,
+      currentFocus: data.current_focus,
+      createdAt: data.created_at,
+    };
   },
 
   // Set current account
@@ -121,179 +70,283 @@ export const storageUtils = {
   },
 
   // Create new account
-  createAccount: (name: string): Account => {
-    const accounts = getAccounts();
-    const newAccount: Account = {
+  createAccount: async (name: string): Promise<Account> => {
+    const newAccount = {
       id: name.toLowerCase().replace(/\s+/g, '-'),
       name,
-      issueCounter: 0,
-      currentFocus: '',
-      createdAt: new Date().toISOString(),
+      issue_counter: 0,
+      current_focus: '',
+      created_at: new Date().toISOString(),
     };
 
-    accounts.push(newAccount);
-    saveAccounts(accounts);
+    const { data, error } = await supabase
+      .from('accounts')
+      .insert(newAccount)
+      .select()
+      .single();
 
-    return newAccount;
+    if (error) {
+      console.error('Error creating account:', error);
+      throw new Error('Failed to create account');
+    }
+
+    return {
+      id: data.id,
+      name: data.name,
+      issueCounter: data.issue_counter,
+      currentFocus: data.current_focus,
+      createdAt: data.created_at,
+    };
   },
 
   // Update account current focus
-  updateAccountFocus: (accountId: string, currentFocus: string): void => {
-    const accounts = getAccounts();
-    const updatedAccounts = accounts.map(a =>
-      a.id === accountId ? { ...a, currentFocus } : a
-    );
-    saveAccounts(updatedAccounts);
-  },
+  updateAccountFocus: async (accountId: string, currentFocus: string): Promise<void> => {
+    const { error } = await supabase
+      .from('accounts')
+      .update({ current_focus: currentFocus })
+      .eq('id', accountId);
 
-  // Get all issues from localStorage for current account
-  getIssues: (): Issue[] => {
-    if (typeof window === 'undefined') return [];
-
-    const accountId = getCurrentAccountId();
-    if (!accountId) return [];
-
-    const stored = localStorage.getItem(`${STORAGE_KEY}-${accountId}`);
-    if (!stored) return [];
-
-    try {
-      const issues = JSON.parse(stored);
-      // Migrate old issues to new format
-      return issues.map((issue: any, index: number) => ({
-        ...issue,
-        issueNumber: issue.issueNumber || `WPM-${index + 1}`,
-        tags: issue.tags || [],
-        commentCount: issue.commentCount || 0,
-      }));
-    } catch {
-      return [];
+    if (error) {
+      console.error('Error updating account focus:', error);
+      throw new Error('Failed to update focus');
     }
   },
 
-  // Save all issues to localStorage for current account
-  saveIssues: (issues: Issue[]): void => {
-    if (typeof window === 'undefined') return;
-
+  // Get all issues from database for current account
+  getIssues: async (): Promise<Issue[]> => {
     const accountId = getCurrentAccountId();
-    if (!accountId) return;
+    if (!accountId) return [];
 
-    localStorage.setItem(`${STORAGE_KEY}-${accountId}`, JSON.stringify(issues));
+    const { data, error } = await supabase
+      .from('issues')
+      .select('*')
+      .eq('account_id', accountId)
+      .order('priority', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching issues:', error);
+      return [];
+    }
+
+    return (data || []).map(row => ({
+      id: row.id,
+      issueNumber: row.issue_number,
+      title: row.title,
+      description: row.description,
+      category: row.category as IssueCategory,
+      priority: row.priority,
+      tags: row.tags || [],
+      commentCount: row.comment_count,
+      dueDate: row.due_date,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    }));
+  },
+
+  // Generate issue number like "WPM-123"
+  generateIssueNumber: async (accountId: string): Promise<string> => {
+    // Get current counter
+    const { data, error } = await supabase
+      .from('accounts')
+      .select('issue_counter')
+      .eq('id', accountId)
+      .single();
+
+    if (error || !data) {
+      console.error('Error fetching issue counter:', error);
+      return 'WPM-1';
+    }
+
+    const nextNumber = data.issue_counter + 1;
+
+    // Update counter
+    await supabase
+      .from('accounts')
+      .update({ issue_counter: nextNumber })
+      .eq('id', accountId);
+
+    return `WPM-${nextNumber}`;
   },
 
   // Add a new issue
-  addIssue: (title: string, description: string, category: IssueCategory): Issue => {
+  addIssue: async (title: string, description: string, category: IssueCategory): Promise<Issue> => {
     const accountId = getCurrentAccountId();
     if (!accountId) throw new Error('No account selected');
 
-    const issues = storageUtils.getIssues();
-    const newIssue: Issue = {
-      id: crypto.randomUUID(),
-      issueNumber: generateIssueNumber(accountId),
+    const issueNumber = await storageUtils.generateIssueNumber(accountId);
+
+    // Get current max priority
+    const { data: existingIssues } = await supabase
+      .from('issues')
+      .select('priority')
+      .eq('account_id', accountId)
+      .order('priority', { ascending: false })
+      .limit(1);
+
+    const maxPriority = existingIssues && existingIssues.length > 0 ? existingIssues[0].priority : -1;
+
+    const newIssue = {
+      account_id: accountId,
+      issue_number: issueNumber,
       title,
       description,
       category,
-      priority: issues.length, // Add to end by default
+      priority: maxPriority + 1,
       tags: [],
-      commentCount: 0,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      comment_count: 0,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     };
 
-    issues.push(newIssue);
-    storageUtils.saveIssues(issues);
-    return newIssue;
+    const { data, error } = await supabase
+      .from('issues')
+      .insert(newIssue)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error adding issue:', error);
+      throw new Error('Failed to add issue');
+    }
+
+    return {
+      id: data.id,
+      issueNumber: data.issue_number,
+      title: data.title,
+      description: data.description,
+      category: data.category as IssueCategory,
+      priority: data.priority,
+      tags: data.tags || [],
+      commentCount: data.comment_count,
+      dueDate: data.due_date,
+      createdAt: data.created_at,
+      updatedAt: data.updated_at,
+    };
   },
 
   // Update an existing issue
-  updateIssue: (id: string, updates: Partial<Issue>): Issue | null => {
-    const issues = storageUtils.getIssues();
-    const index = issues.findIndex(issue => issue.id === id);
-
-    if (index === -1) return null;
-
-    issues[index] = {
-      ...issues[index],
-      ...updates,
-      updatedAt: new Date().toISOString(),
+  updateIssue: async (id: string, updates: Partial<Issue>): Promise<Issue | null> => {
+    const updateData: any = {
+      updated_at: new Date().toISOString(),
     };
 
-    storageUtils.saveIssues(issues);
-    return issues[index];
+    if (updates.title !== undefined) updateData.title = updates.title;
+    if (updates.description !== undefined) updateData.description = updates.description;
+    if (updates.category !== undefined) updateData.category = updates.category;
+    if (updates.priority !== undefined) updateData.priority = updates.priority;
+    if (updates.tags !== undefined) updateData.tags = updates.tags;
+    if (updates.commentCount !== undefined) updateData.comment_count = updates.commentCount;
+    if (updates.dueDate !== undefined) updateData.due_date = updates.dueDate;
+
+    const { data, error } = await supabase
+      .from('issues')
+      .update(updateData)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating issue:', error);
+      return null;
+    }
+
+    return {
+      id: data.id,
+      issueNumber: data.issue_number,
+      title: data.title,
+      description: data.description,
+      category: data.category as IssueCategory,
+      priority: data.priority,
+      tags: data.tags || [],
+      commentCount: data.comment_count,
+      dueDate: data.due_date,
+      createdAt: data.created_at,
+      updatedAt: data.updated_at,
+    };
   },
 
   // Delete an issue
-  deleteIssue: (id: string): boolean => {
-    const issues = storageUtils.getIssues();
-    const filtered = issues.filter(issue => issue.id !== id);
+  deleteIssue: async (id: string): Promise<boolean> => {
+    const { error } = await supabase
+      .from('issues')
+      .delete()
+      .eq('id', id);
 
-    if (filtered.length === issues.length) return false;
+    if (error) {
+      console.error('Error deleting issue:', error);
+      return false;
+    }
 
-    storageUtils.saveIssues(filtered);
     return true;
   },
 
   // Reorder issues (used after drag and drop)
-  reorderIssues: (reorderedIssues: Issue[]): void => {
-    // Update priority based on new order
-    const withUpdatedPriority = reorderedIssues.map((issue, index) => ({
-      ...issue,
+  reorderIssues: async (reorderedIssues: Issue[]): Promise<void> => {
+    // Update priority for each issue
+    const updates = reorderedIssues.map((issue, index) => ({
+      id: issue.id,
       priority: index,
-      updatedAt: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     }));
 
-    storageUtils.saveIssues(withUpdatedPriority);
+    // Batch update
+    for (const update of updates) {
+      await supabase
+        .from('issues')
+        .update({ priority: update.priority, updated_at: update.updated_at })
+        .eq('id', update.id);
+    }
   },
 
   // Import issues from JSON
-  importIssues: (importedIssues: Partial<Issue>[]): Issue[] => {
+  importIssues: async (importedIssues: Partial<Issue>[]): Promise<Issue[]> => {
     const accountId = getCurrentAccountId();
     if (!accountId) throw new Error('No account selected');
 
-    const existingIssues = storageUtils.getIssues();
+    const issuesData = [];
 
-    // Transform imported issues to match our Issue type
-    const newIssues = importedIssues.map((imported) => {
+    for (const imported of importedIssues) {
+      const issueNumber = imported.issueNumber || await storageUtils.generateIssueNumber(accountId);
       const now = new Date().toISOString();
 
-      return {
-        id: imported.id || crypto.randomUUID(),
-        issueNumber: imported.issueNumber || generateIssueNumber(accountId),
+      issuesData.push({
+        id: imported.id || undefined, // Let Supabase generate if not provided
+        account_id: accountId,
+        issue_number: issueNumber,
         title: imported.title || 'Untitled Issue',
         description: imported.description || '',
         category: (imported.category as IssueCategory) || 'planned',
-        priority: imported.priority ?? (existingIssues.length + importedIssues.indexOf(imported)),
+        priority: imported.priority ?? 0,
         tags: imported.tags || [],
-        commentCount: imported.commentCount ?? 0,
-        dueDate: imported.dueDate,
-        createdAt: imported.createdAt || now,
-        updatedAt: imported.updatedAt || now,
-      } as Issue;
-    });
+        comment_count: imported.commentCount ?? 0,
+        due_date: imported.dueDate,
+        created_at: imported.createdAt || now,
+        updated_at: imported.updatedAt || now,
+      });
+    }
 
-    // Combine with existing issues
-    const allIssues = [...existingIssues, ...newIssues];
-    storageUtils.saveIssues(allIssues);
+    const { data, error } = await supabase
+      .from('issues')
+      .insert(issuesData)
+      .select();
 
-    return allIssues;
+    if (error) {
+      console.error('Error importing issues:', error);
+      throw new Error('Failed to import issues');
+    }
+
+    // Return all issues for current account
+    return await storageUtils.getIssues();
   },
 
   // Initialize accounts if needed
-  initializeAccounts: (): void => {
-    checkVersion(); // Migrate old data if needed
+  initializeAccounts: async (): Promise<void> => {
+    const accounts = await storageUtils.getAccounts();
 
-    const accounts = getAccounts();
     if (accounts.length === 0) {
       // Create Willard account by default
-      const willardAccount: Account = {
-        id: 'willard',
-        name: 'Willard',
-        issueCounter: 0,
-        currentFocus: '',
-        createdAt: new Date().toISOString(),
-      };
-
-      saveAccounts([willardAccount]);
-      setCurrentAccountId('willard');
+      const willardAccount = await storageUtils.createAccount('Willard');
+      setCurrentAccountId(willardAccount.id);
     } else if (!getCurrentAccountId()) {
       // Set first account as current if none is set
       setCurrentAccountId(accounts[0].id);
@@ -301,119 +354,138 @@ export const storageUtils = {
   },
 
   // Seed dummy data if no issues exist
-  seedDummyData: (): Issue[] => {
-    storageUtils.initializeAccounts();
+  seedDummyData: async (): Promise<Issue[]> => {
+    await storageUtils.initializeAccounts();
 
-    const existing = storageUtils.getIssues();
+    const existing = await storageUtils.getIssues();
     if (existing.length > 0) return existing;
 
+    const accountId = getCurrentAccountId();
+    if (!accountId) return [];
+
     const now = new Date();
-    const dummyIssues: Issue[] = [
+    const dummyIssues = [
       {
-        id: crypto.randomUUID(),
-        issueNumber: 'WPM-1',
+        account_id: accountId,
+        issue_number: 'WPM-1',
         title: 'Fix login page UI bugs',
         description: 'The login button is misaligned on mobile devices and the password field validation message is not showing correctly.',
-        category: 'in-review',
+        category: 'in-review' as IssueCategory,
         priority: 0,
         tags: ['Bug', 'UI'],
-        commentCount: 3,
-        dueDate: 'Jan 18',
-        createdAt: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-        updatedAt: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+        comment_count: 3,
+        due_date: 'Jan 18',
+        created_at: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+        updated_at: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000).toISOString(),
       },
       {
-        id: crypto.randomUUID(),
-        issueNumber: 'WPM-2',
+        account_id: accountId,
+        issue_number: 'WPM-2',
         title: 'Implement user profile page',
         description: 'Create a dedicated profile page where users can view and edit their information, upload profile pictures, and manage account settings.',
-        category: 'in-progress',
+        category: 'in-progress' as IssueCategory,
         priority: 1,
         tags: ['Feature'],
-        commentCount: 7,
-        dueDate: 'Jan 20',
-        createdAt: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-        updatedAt: new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString(),
+        comment_count: 7,
+        due_date: 'Jan 20',
+        created_at: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+        updated_at: new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString(),
       },
       {
-        id: crypto.randomUUID(),
-        issueNumber: 'WPM-3',
+        account_id: accountId,
+        issue_number: 'WPM-3',
         title: 'Add dark mode support',
         description: 'Implement a dark mode theme with a toggle switch in the settings. Should respect system preferences and persist user choice.',
-        category: 'in-progress',
+        category: 'in-progress' as IssueCategory,
         priority: 2,
         tags: ['Feature', 'UI'],
-        commentCount: 2,
-        dueDate: 'Jan 25',
-        createdAt: new Date(now.getTime() - 4 * 24 * 60 * 60 * 1000).toISOString(),
-        updatedAt: new Date(now.getTime() - 5 * 60 * 60 * 1000).toISOString(),
+        comment_count: 2,
+        due_date: 'Jan 25',
+        created_at: new Date(now.getTime() - 4 * 24 * 60 * 60 * 1000).toISOString(),
+        updated_at: new Date(now.getTime() - 5 * 60 * 60 * 1000).toISOString(),
       },
       {
-        id: crypto.randomUUID(),
-        issueNumber: 'WPM-4',
+        account_id: accountId,
+        issue_number: 'WPM-4',
         title: 'Optimize database queries',
         description: 'Several dashboard queries are slow. Need to add proper indexing and optimize the N+1 query problems in the user activity feed.',
-        category: 'planned',
+        category: 'planned' as IssueCategory,
         priority: 3,
         tags: ['Performance'],
-        commentCount: 5,
-        dueDate: 'Feb 1',
-        createdAt: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-        updatedAt: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+        comment_count: 5,
+        due_date: 'Feb 1',
+        created_at: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+        updated_at: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString(),
       },
       {
-        id: crypto.randomUUID(),
-        issueNumber: 'WPM-5',
+        account_id: accountId,
+        issue_number: 'WPM-5',
         title: 'Write API documentation',
         description: 'Document all REST API endpoints with request/response examples, authentication requirements, and error codes.',
-        category: 'planned',
+        category: 'planned' as IssueCategory,
         priority: 4,
         tags: ['Documentation'],
-        commentCount: 1,
-        createdAt: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-        updatedAt: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+        comment_count: 1,
+        created_at: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+        updated_at: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString(),
       },
       {
-        id: crypto.randomUUID(),
-        issueNumber: 'WPM-6',
+        account_id: accountId,
+        issue_number: 'WPM-6',
         title: 'Set up automated testing pipeline',
         description: 'Configure CI/CD to run unit tests, integration tests, and E2E tests on every pull request. Set up test coverage reporting.',
-        category: 'planned',
+        category: 'planned' as IssueCategory,
         priority: 5,
         tags: ['DevOps', 'Testing'],
-        commentCount: 4,
-        dueDate: 'Jan 30',
-        createdAt: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-        updatedAt: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+        comment_count: 4,
+        due_date: 'Jan 30',
+        created_at: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+        updated_at: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000).toISOString(),
       },
       {
-        id: crypto.randomUUID(),
-        issueNumber: 'WPM-7',
+        account_id: accountId,
+        issue_number: 'WPM-7',
         title: 'Add email notifications',
         description: 'Send email notifications for important events: password resets, account changes, weekly activity summaries.',
-        category: 'planned',
+        category: 'planned' as IssueCategory,
         priority: 6,
         tags: ['Feature'],
-        commentCount: 0,
-        createdAt: new Date(now.getTime() - 12 * 60 * 60 * 1000).toISOString(),
-        updatedAt: new Date(now.getTime() - 12 * 60 * 60 * 1000).toISOString(),
+        comment_count: 0,
+        created_at: new Date(now.getTime() - 12 * 60 * 60 * 1000).toISOString(),
+        updated_at: new Date(now.getTime() - 12 * 60 * 60 * 1000).toISOString(),
       },
       {
-        id: crypto.randomUUID(),
-        issueNumber: 'WPM-8',
+        account_id: accountId,
+        issue_number: 'WPM-8',
         title: 'Improve mobile responsiveness',
         description: 'Several pages need better mobile layouts. Focus on the dashboard, settings, and data tables.',
-        category: 'planned',
+        category: 'planned' as IssueCategory,
         priority: 7,
         tags: ['UI', 'Mobile'],
-        commentCount: 6,
-        dueDate: 'Feb 5',
-        createdAt: new Date(now.getTime() - 6 * 60 * 60 * 1000).toISOString(),
-        updatedAt: new Date(now.getTime() - 6 * 60 * 60 * 1000).toISOString(),
+        comment_count: 6,
+        due_date: 'Feb 5',
+        created_at: new Date(now.getTime() - 6 * 60 * 60 * 1000).toISOString(),
+        updated_at: new Date(now.getTime() - 6 * 60 * 60 * 1000).toISOString(),
       },
     ];
 
-    storageUtils.saveIssues(dummyIssues);
-    return dummyIssues;
+    // Insert dummy data
+    const { data, error } = await supabase
+      .from('issues')
+      .insert(dummyIssues)
+      .select();
+
+    if (error) {
+      console.error('Error seeding dummy data:', error);
+      return [];
+    }
+
+    // Update issue counter
+    await supabase
+      .from('accounts')
+      .update({ issue_counter: 8 })
+      .eq('id', accountId);
+
+    return await storageUtils.getIssues();
   },
 };
